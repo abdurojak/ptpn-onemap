@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  //   output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+
+  folders      Folder[]
+  files        File[]       @relation("FileToUser")
+  SharedItemBy SharedItem[] @relation("SharedBy")
+  SharedItemTo SharedItem[] @relation("SharedTo")
+}
+
+model Folder {
+  id        Int      @id @default(autoincrement())
+  name      String
+  userId    Int
+  shared    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt()
+  isStarred Boolean  @default(false)
+  isDeleted Boolean  @default(false)
+
+  files      File[]
+  user       User         @relation(fields: [userId], references: [id])
+  SharedItem SharedItem[]
+}
+
+model File {
+  id         Int      @id @default(autoincrement())
+  name       String
+  size       Int
+  folderId   Int
+  uploadedAt DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+  isStarred  Boolean  @default(false)
+  isDeleted  Boolean  @default(false)
+
+  folder     Folder       @relation(fields: [folderId], references: [id])
+  User       User[]       @relation("FileToUser")
+  SharedItem SharedItem[]
+}
+
+model SharedItem {
+  id         Int      @id @default(autoincrement())
+  fileId     Int? // nullable: bisa file atau folder
+  folderId   Int?
+  sharedToId Int // user penerima
+  sharedById Int // user pengirim
+  createdAt  DateTime @default(now())
+
+  file     File?   @relation(fields: [fileId], references: [id])
+  folder   Folder? @relation(fields: [folderId], references: [id])
+  sharedTo User    @relation("SharedTo", fields: [sharedToId], references: [id])
+  sharedBy User    @relation("SharedBy", fields: [sharedById], references: [id])
+}
