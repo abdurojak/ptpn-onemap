@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
@@ -9,6 +10,8 @@ import { FaHome, FaPeopleArrows, FaStar, FaClock, FaTrashAlt } from "react-icons
 import { MdAddPhotoAlternate } from "react-icons/md";
 import { AiFillFolderAdd, AiFillFileAdd } from "react-icons/ai";
 import { BsDatabaseFillAdd } from "react-icons/bs";
+import FileDragger from "@/components/base/file-dragger";
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,6 +19,13 @@ import {
     DropdownMenuTrigger,
     DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 
 const menu = [
     { icon: <FaHome />, label: "Beranda", href: "/home" },
@@ -28,6 +38,13 @@ const menu = [
 
 export default function Sidebar({ onLinkClick }: { onLinkClick?: () => void }) {
     const pathname = usePathname()
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [dialogType, setDialogType] = useState<null | "folder" | "foto" | "kamus" | "api">(null)
+
+    const openDialog = (type: typeof dialogType) => {
+        setDialogType(type)
+        setDialogOpen(true)
+    }
 
     return (
         <div className="w-64 p-4 space-y-4">
@@ -42,23 +59,63 @@ export default function Sidebar({ onLinkClick }: { onLinkClick?: () => void }) {
                     </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-60">
-                    <DropdownMenuItem onClick={() => console.log("Tambah Folder")}>
+                    <DropdownMenuItem onClick={() => openDialog("folder")}>
                         <AiFillFolderAdd />
-                        Tambah Folder
+                        <span className="ml-2">Tambah Folder</span>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator /> {/* Garis pembatas */}
-                    <DropdownMenuItem onClick={() => console.log("Tambah File")}>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => openDialog("foto")}>
                         <MdAddPhotoAlternate />
-                        Upload Foto Udara
+                        <span className="ml-2">Upload Foto Udara</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => console.log("Tambah File")}>
-                        <BsDatabaseFillAdd /> Upload Data Sesuai Kamus
+                    <DropdownMenuItem onClick={() => openDialog("kamus")}>
+                        <BsDatabaseFillAdd />
+                        <span className="ml-2">Upload Data Sesuai Kamus</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => console.log("Tambah File")}>
-                        <AiFillFileAdd /> Upload Data API
+                    <DropdownMenuItem onClick={() => openDialog("api")}>
+                        <AiFillFileAdd />
+                        <span className="ml-2">Upload Data API</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
+
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {dialogType === "folder" && "Tambah Folder"}
+                            {dialogType === "foto" && "Upload Foto Udara"}
+                            {dialogType === "kamus" && "Upload Data Kamus"}
+                            {dialogType === "api" && "Upload Data API"}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {dialogType === "folder" && "Masukkan nama folder baru untuk menyimpan file Anda."}
+                            {dialogType === "foto" && "Unggah file foto udara dari perangkat Anda."}
+                            {dialogType === "kamus" && "Unggah data yang sesuai dengan format kamus data."}
+                            {dialogType === "api" && "Unggah data dari sumber API."}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {/* Isi dialog sesuai kebutuhan */}
+                    <div className="mt-4">
+                        {/* {dialogType === "folder" && (
+                            <p>Form Tambah Folder di sini...</p>
+                        )}
+                        {dialogType === "foto" && (
+                            <p>Form Upload Foto di sini...</p>
+                        )}
+                        {dialogType === "kamus" && (
+                            <p>Form Upload Data Kamus di sini...</p>
+                        )}
+                        {dialogType === "api" && (
+                            <p>Form Upload API di sini...</p>
+                        )} */}
+                        <FileDragger onFilesSelected={(files) => {
+                            console.log("Files uploaded:", files)
+                        }} />
+                    </div>
+                </DialogContent>
+            </Dialog>
 
             <nav className="space-y-2">
                 {menu.map((item) => {

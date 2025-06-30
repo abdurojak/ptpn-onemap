@@ -56,7 +56,15 @@ export default function FileListPage() {
             <h1 className="text-xl font-semibold mb-4">Selamat Datang di CMS One Map</h1>
             <div className="min-h-full flex items-center justify-center p-4">
                 <div className="w-full max-w-md">
-
+                    <Dragger {...uploadProps} className="rounded-md">
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">Data masih kosong</p>
+                        <p className="ant-upload-hint text-sm text-gray-500">
+                            Klik disini atau seret file pada area ini.
+                        </p>
+                    </Dragger>
                 </div>
             </div>
         </div>
