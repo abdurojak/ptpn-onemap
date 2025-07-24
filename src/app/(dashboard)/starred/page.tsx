@@ -79,7 +79,7 @@ export default function FileListPage() {
     return (
         <div className="p-6">
 
-            <h1 className="text-xl font-semibold mb-4">Data Saya</h1>
+            <h1 className="text-xl font-semibold mb-4">Berbintang</h1>
 
             <div className="overflow-x-auto">
                 <table className="min-w-full text-sm border border-gray-200 rounded-md">

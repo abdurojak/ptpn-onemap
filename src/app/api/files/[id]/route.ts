@@ -2,17 +2,13 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 
-interface Params {
-    params: {
-        id: string
-    }
-}
-
-export async function PATCH(req: Request, { params }: Params) {
+export async function PATCH(req: Request) {
     try {
+        const url = new URL(req.url)
+        const id = url.pathname.split("/").pop() // ambil ID dari path URL
         const body = await req.json()
         const updated = await prisma.file.update({
-            where: { id: Number(params.id) },
+            where: { id: Number(id) },
             data: body,
         })
         return NextResponse.json(updated)
