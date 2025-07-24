@@ -11,6 +11,8 @@ import { MdAddPhotoAlternate } from "react-icons/md";
 import { AiFillFolderAdd, AiFillFileAdd } from "react-icons/ai";
 import { BsDatabaseFillAdd } from "react-icons/bs";
 import FileDragger from "@/components/base/file-dragger";
+import UploadFolderButton from '@/components/base/upload-folder-button'
+
 
 import {
     DropdownMenu,
@@ -26,17 +28,24 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import { useFileStore } from "../../../stores/useFileStores"
+import { SidebarClose } from "lucide-react"
 
 const menu = [
     { icon: <FaHome />, label: "Beranda", href: "/home" },
     { icon: <FaHardDrive />, label: "Data Saya", href: "/my-files" },
-    { icon: <FaPeopleArrows />, label: "Dibagikan Kepada Saya", href: "/shared" },
+    { icon: <FaPeopleArrows />, label: "Dibagikan ke Saya", href: "/shared" },
     { icon: <FaStar />, label: "Berbintang", href: "/starred" },
     { icon: <FaClock />, label: "Terbaru", href: "/recent" },
     { icon: <FaTrashAlt />, label: "Sampah", href: "/trash" },
 ]
 
-export default function Sidebar({ onLinkClick }: { onLinkClick?: () => void }) {
+interface SidebarProps {
+    onLinkClick?: () => void,
+    onSidebarClose?: () => void
+}
+
+export default function Sidebar({ onLinkClick, onSidebarClose }: SidebarProps) {
     const pathname = usePathname()
     const [dialogOpen, setDialogOpen] = useState(false)
     const [dialogType, setDialogType] = useState<null | "folder" | "foto" | "kamus" | "api">(null)
@@ -59,11 +68,11 @@ export default function Sidebar({ onLinkClick }: { onLinkClick?: () => void }) {
                     </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-60">
-                    <DropdownMenuItem onClick={() => openDialog("folder")}>
+                    {/* <DropdownMenuItem onClick={() => openDialog("folder")}>
                         <AiFillFolderAdd />
                         <span className="ml-2">Tambah Folder</span>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator /> */}
                     <DropdownMenuItem onClick={() => openDialog("foto")}>
                         <MdAddPhotoAlternate />
                         <span className="ml-2">Upload Foto Udara</span>
@@ -96,23 +105,26 @@ export default function Sidebar({ onLinkClick }: { onLinkClick?: () => void }) {
                         </DialogDescription>
                     </DialogHeader>
 
-                    {/* Isi dialog sesuai kebutuhan */}
                     <div className="mt-4">
-                        {/* {dialogType === "folder" && (
-                            <p>Form Tambah Folder di sini...</p>
+                        {dialogType === "folder" && (
+                            <UploadFolderButton onFolderSelected={(files) => {
+                                console.log("Folder uploaded:", files)
+                            }}>
+                            </UploadFolderButton>
                         )}
-                        {dialogType === "foto" && (
-                            <p>Form Upload Foto di sini...</p>
+
+                        {dialogType !== "folder" && (
+                            <FileDragger
+                                onFilesSelected={(files) => {
+                                    console.log("Files uploaded:", files)
+                                }}
+                                onUploadComplete={() => {
+                                    useFileStore.getState().triggerRefresh()
+                                    setDialogOpen(false) // 👉 Tutup dialog
+                                    onSidebarClose?.() // 👉 Panggil fungsi penutup sidebar jika ada
+                                }}
+                            />
                         )}
-                        {dialogType === "kamus" && (
-                            <p>Form Upload Data Kamus di sini...</p>
-                        )}
-                        {dialogType === "api" && (
-                            <p>Form Upload API di sini...</p>
-                        )} */}
-                        <FileDragger onFilesSelected={(files) => {
-                            console.log("Files uploaded:", files)
-                        }} />
                     </div>
                 </DialogContent>
             </Dialog>

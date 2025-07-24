@@ -11,11 +11,13 @@ import { FaUser } from "react-icons/fa"
 import { IoMdPerson } from "react-icons/io";
 import { IoIosLogOut } from "react-icons/io";
 import Link from "next/link"
+import { useFileStore } from "../../../stores/useFileStores";
 
 export default function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
     const handleLogout = () => {
 
     };
+    const setSearchQuery = useFileStore((state) => state.setSearchQuery)
     return (
         <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
             <div className="flex items-center gap-2 flex-1 pr-4">
@@ -25,6 +27,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
                 <input
                     type="text"
                     placeholder="Cari"
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full rounded-full px-4 py-2 border bg-white text-sm focus:outline-none"
                 />
             </div>

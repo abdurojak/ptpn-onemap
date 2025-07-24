@@ -1,11 +1,27 @@
-// app/api/files/route.ts
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 
-// GET: ambil semua file
-export async function GET() {
+export async function GET(req: Request) {
     try {
-        const files = await prisma.file.findMany();
+        const { searchParams } = new URL(req.url);
+        const deletedParam = searchParams.get("deleted");
+        const starredParam = searchParams.get("starred");
+
+        const where: any = {};
+
+        // Tambahkan filter jika param tersedia
+        if (deletedParam !== null) {
+            where.isDeleted = deletedParam === "true";
+        }
+
+        if (starredParam !== null) {
+            where.isStarred = starredParam === "true";
+        }
+
+        const files = await prisma.file.findMany({
+            where,
+        });
+
         return NextResponse.json(files);
     } catch (error) {
         console.error("GET /api/files error:", error);

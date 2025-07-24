@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     className={`fixed inset-y-0 left-0 z-30 w-64 min-h-full bg-white shadow-md transform transition-transform duration-300 lg:relative lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
                         }`}
                 >
-                    <Sidebar onLinkClick={() => setSidebarOpen(false)} />
+                    <Sidebar onLinkClick={() => setSidebarOpen(false)} onSidebarClose={() => setSidebarOpen(false)} />
                 </div>
 
                 {/* Tombol ✕ di luar sidebar */}
