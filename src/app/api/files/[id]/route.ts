@@ -22,7 +22,7 @@ export async function PATCH(req: Request, { params }: Params) {
     }
 }
 
-export async function DELETE(req: Request, { params }: Params) {
+export async function DELETE({ params }: Params) {
     try {
         const deleted = await prisma.file.delete({
             where: { id: Number(params.id) }
