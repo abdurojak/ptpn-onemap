@@ -22,10 +22,12 @@ export async function PATCH(req: Request, { params }: Params) {
     }
 }
 
-export async function DELETE({ params }: Params) {
+export async function DELETE(req: Request) {
     try {
+        const url = new URL(req.url)
+        const id = url.pathname.split("/").pop() // ambil ID dari path URL
         const deleted = await prisma.file.delete({
-            where: { id: Number(params.id) }
+            where: { id: Number(id) }
         })
         return NextResponse.json(deleted)
     } catch (error) {
@@ -33,4 +35,3 @@ export async function DELETE({ params }: Params) {
         return NextResponse.json({ error: "Failed to delete file" }, { status: 500 })
     }
 }
-
