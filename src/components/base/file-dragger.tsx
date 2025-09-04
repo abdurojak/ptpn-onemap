@@ -4,18 +4,28 @@ import { useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button" // pastikan kamu punya ini
+import { toast, Toaster } from 'sonner'
 
 interface FileDraggerProps {
     onFilesSelected: (files: FileList) => void,
-    onUploadComplete?: () => void
+    onUploadComplete?: () => void,
+    type?: "foto" | "kamus" | "api" // Tambah ini
 }
 
-export default function FileDragger({ onFilesSelected, onUploadComplete }: FileDraggerProps) {
+export default function FileDragger({ onFilesSelected, onUploadComplete, type }: FileDraggerProps) {
     const [isDragging, setIsDragging] = useState(false)
     const [fileName, setFileName] = useState("")
     const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null)
     const inputRef = useRef<HTMLInputElement | null>(null)
     const [uploadProgress, setUploadProgress] = useState<number>(0)
+
+    const validateTiffFile = (file: File) => {
+        const allowedTypes = ["image/tiff", "image/x-tiff"]
+        const allowedExtensions = [".tiff", ".tif"]
+        const extension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase()
+
+        return allowedTypes.includes(file.type) || allowedExtensions.includes(extension)
+    }
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault()
@@ -42,11 +52,20 @@ export default function FileDragger({ onFilesSelected, onUploadComplete }: FileD
     }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setSelectedFiles(e.target.files)
-            setFileName(e.target.files[0].name)
+        const file = e.target.files?.[0]
+
+        if (!file) return
+
+        if (type === "foto" && !validateTiffFile(file)) {
+            toast.error("Hanya file .tiff yang diperbolehkan untuk foto udara.")
+            e.target.value = ""
+            return
         }
+
+        setSelectedFiles(e.target.files)
+        setFileName(file.name)
     }
+
 
     const handleClick = () => {
         inputRef.current?.click()
@@ -116,7 +135,6 @@ export default function FileDragger({ onFilesSelected, onUploadComplete }: FileD
                 <p className="text-sm text-gray-600">Tarik dan lepas file di sini atau klik untuk memilih</p>
                 {fileName && <p className="mt-2 text-sm text-green-600">{fileName}</p>}
             </div>
-
             <input
                 ref={inputRef}
                 type="file"

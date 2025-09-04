@@ -115,13 +115,14 @@ export default function Sidebar({ onLinkClick, onSidebarClose }: SidebarProps) {
 
                         {dialogType !== "folder" && (
                             <FileDragger
+                                type={dialogType} // ⬅️ tambahkan ini
                                 onFilesSelected={(files) => {
                                     console.log("Files uploaded:", files)
                                 }}
                                 onUploadComplete={() => {
                                     useFileStore.getState().triggerRefresh()
-                                    setDialogOpen(false) // 👉 Tutup dialog
-                                    onSidebarClose?.() // 👉 Panggil fungsi penutup sidebar jika ada
+                                    setDialogOpen(false)
+                                    onSidebarClose?.()
                                 }}
                             />
                         )}

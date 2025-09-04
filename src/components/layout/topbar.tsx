@@ -12,6 +12,7 @@ import { IoMdPerson } from "react-icons/io";
 import { IoIosLogOut } from "react-icons/io";
 import Link from "next/link"
 import { useFileStore } from "../../../stores/useFileStores";
+import { Toaster } from "../ui/sonner";
 
 export default function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
     const handleLogout = () => {
@@ -31,7 +32,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
                     className="w-full rounded-full px-4 py-2 border bg-white text-sm focus:outline-none"
                 />
             </div>
-
+            <Toaster position="top-center" />
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <button className="w-9 h-9 rounded-full bg-green-900 flex items-center justify-center text-white text-sm">
