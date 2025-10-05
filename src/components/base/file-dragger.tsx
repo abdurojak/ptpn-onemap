@@ -71,54 +71,106 @@ export default function FileDragger({ onFilesSelected, onUploadComplete, type }:
         inputRef.current?.click()
     }
 
+    // const handleUpload = async () => {
+    //     if (!selectedFiles || selectedFiles.length === 0) return
+
+    //     const file = selectedFiles[0]
+    //     const formData = new FormData()
+    //     formData.append("file", file)
+    //     formData.append("folderId", "1") // sementara
+
+    //     const xhr = new XMLHttpRequest()
+
+    //     xhr.upload.addEventListener("progress", (event) => {
+    //         if (event.lengthComputable) {
+    //             const percent = Math.round((event.loaded / event.total) * 100)
+    //             setUploadProgress(percent)
+    //         }
+    //     })
+
+    //     xhr.onreadystatechange = () => {
+    //         if (xhr.readyState === XMLHttpRequest.DONE) {
+    //             if (xhr.status === 200) {
+    //                 console.log("Upload complete:", JSON.parse(xhr.responseText))
+    //                 setUploadProgress(0) // reset
+    //             } else {
+    //                 console.error("Upload failed", xhr.responseText)
+    //                 setUploadProgress(0)
+    //             }
+    //         }
+    //     }
+
+    //     xhr.onreadystatechange = () => {
+    //         if (xhr.readyState === XMLHttpRequest.DONE) {
+    //             if (xhr.status === 200) {
+    //                 console.log("Upload complete:", JSON.parse(xhr.responseText))
+    //                 setUploadProgress(0)
+    //                 setSelectedFiles(null)
+    //                 setFileName("")
+    //                 onUploadComplete?.() // 👉 panggil fungsi penutup dialog
+    //             } else {
+    //                 console.error("Upload failed", xhr.responseText)
+    //                 setUploadProgress(0)
+    //             }
+    //         }
+    //     }
+
+    //     xhr.open("POST", "/api/upload")
+    //     xhr.send(formData)
+    // }
+
     const handleUpload = async () => {
-        if (!selectedFiles || selectedFiles.length === 0) return
+        if (!selectedFiles || selectedFiles.length === 0) return;
 
-        const file = selectedFiles[0]
-        const formData = new FormData()
-        formData.append("file", file)
-        formData.append("folderId", "1") // sementara
+        const file = selectedFiles[0];
+        const formData = new FormData();
+        formData.append("file", file);
 
-        const xhr = new XMLHttpRequest()
+        const fileServerUrl = process.env.NEXT_PUBLIC_FILE_SERVER_URL || 'http://localhost:4000';
 
-        xhr.upload.addEventListener("progress", (event) => {
-            if (event.lengthComputable) {
-                const percent = Math.round((event.loaded / event.total) * 100)
-                setUploadProgress(percent)
+        try {
+            // LANGKAH 1: Kirim file fisik ke Server Express
+            toast.info("Mengunggah file...");
+            const fileResponse = await fetch(`${fileServerUrl}/upload`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!fileResponse.ok) throw new Error("Gagal mengunggah file fisik.");
+
+            const fileData = await fileResponse.json();
+            // fileData -> { fileName, originalName, size }
+
+            // LANGKAH 2: Kirim metadata ke API Next.js
+            toast.info("Menyimpan informasi file...");
+            const metadataResponse = await fetch('/api/files/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: fileData.originalName,
+                    size: fileData.size,
+                    filePath: fileData.fileName,
+                    folderId: 1, // Anda bisa ambil ini dari state atau props
+                }),
+            });
+
+            if (!metadataResponse.ok) throw new Error("Gagal menyimpan metadata file.");
+
+            toast.success("File berhasil diunggah!");
+            onUploadComplete?.(); // Jalankan callback jika ada
+
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error("Terjadi kesalahan tidak diketahui.");
             }
-        })
-
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    console.log("Upload complete:", JSON.parse(xhr.responseText))
-                    setUploadProgress(0) // reset
-                } else {
-                    console.error("Upload failed", xhr.responseText)
-                    setUploadProgress(0)
-                }
-            }
+        } finally {
+            // Reset state
+            setSelectedFiles(null);
+            setFileName("");
         }
-
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    console.log("Upload complete:", JSON.parse(xhr.responseText))
-                    setUploadProgress(0)
-                    setSelectedFiles(null)
-                    setFileName("")
-                    onUploadComplete?.() // 👉 panggil fungsi penutup dialog
-                } else {
-                    console.error("Upload failed", xhr.responseText)
-                    setUploadProgress(0)
-                }
-            }
-        }
-
-        xhr.open("POST", "/api/upload")
-        xhr.send(formData)
-    }
-
+    };
 
     return (
         <div className="space-y-4">

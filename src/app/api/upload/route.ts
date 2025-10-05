@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    const uploadDir = path.join(process.cwd(), 'public/uploads')
+    const uploadDir = path.join(process.cwd(), 'src/assets')
     await mkdir(uploadDir, { recursive: true })
 
     const filePath = path.join(uploadDir, file.name)
@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
             name: file.name,
             size: file.size,
             folderId: parseInt(folderId.toString()),
+            filePath: filePath, // Add this line to include filePath
             User: {
                 connect: {
                     id: userId,

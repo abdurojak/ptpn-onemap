@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import logo from '@/assets/img/ptpn-onemap.png';
+import logo from '../../../public/assets/img/ptpn-onemap.png';
 
 export function LoginForm({
     className,

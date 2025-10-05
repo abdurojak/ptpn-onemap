@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
-import logo from '@/assets/img/ptpn-onemap.png'
+import logo from '../../../public/assets/img/ptpn-onemap.png'
 import { FaPlus, FaHardDrive } from "react-icons/fa6";
 import { FaHome, FaPeopleArrows, FaStar, FaClock, FaTrashAlt } from "react-icons/fa";
 import { MdAddPhotoAlternate } from "react-icons/md";
@@ -115,7 +115,7 @@ export default function Sidebar({ onLinkClick, onSidebarClose }: SidebarProps) {
 
                         {dialogType !== "folder" && (
                             <FileDragger
-                                type={dialogType} // ⬅️ tambahkan ini
+                                type={dialogType || undefined}
                                 onFilesSelected={(files) => {
                                     console.log("Files uploaded:", files)
                                 }}
