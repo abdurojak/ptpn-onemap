@@ -38,6 +38,8 @@ export async function POST(req: Request) {
                 name: body.name,
                 size: body.size,
                 folderId: body.folderId,
+                filePath: body.filePath, // Make sure body.filePath exists
+                folder: body.folder,     // Make sure body.folder exists or provide a valid value
             },
         })
         return NextResponse.json(file)
