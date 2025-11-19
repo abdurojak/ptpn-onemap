@@ -1,42 +1,32 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { compare, hash } from "bcrypt";
+import { compare } from "bcrypt";
 
 export async function POST(req: Request) {
   try {
-    const { email, password, name } = await req.json();
+    const { email, password } = await req.json();
+    const user = await prisma.user.findUnique({ where: { email } });
 
-    // Cek apakah user sudah ada
-    let user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    // Kalau belum ada, buat user baru
     if (!user) {
-      const hashedPassword = await hash(password, 10);
-      user = await prisma.user.create({
-        data: {
-          name: name || "New User",
-          email,
-          password: hashedPassword,
-        },
-      });
-
-      return NextResponse.json(
-        { message: "User registered and logged in successfully", user },
-        { status: 201 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Kalau sudah ada, cek password
     const isValid = await compare(password, user.password);
     if (!isValid) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
-    return NextResponse.json({ message: "Login successful", user }, { status: 200 });
+    // Buat response dan set cookie
+    const res = NextResponse.json({ message: "Login successful" });
+    res.cookies.set("loggedIn", "true", {
+      httpOnly: true,
+      path: "/",
+      maxAge: 60 * 60 * 24, // 1 hari
+    });
+
+    return res;
   } catch (error) {
-    console.error("Login/Register error :", error);
+    console.error(error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

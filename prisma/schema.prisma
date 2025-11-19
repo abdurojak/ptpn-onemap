@@ -8,9 +8,20 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  name     String
-  email    String  @unique
-  password String
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
+}
+
+model File {
+  id         Int       @id @default(autoincrement())
+  name       String
+  size       Int?
+  folderId   Int?
+  uploadedAt DateTime  @default(now())
+  updatedAt  DateTime?
+  isDeleted  Boolean   @default(false)
+  isStarred  Boolean   @default(false)
 }
