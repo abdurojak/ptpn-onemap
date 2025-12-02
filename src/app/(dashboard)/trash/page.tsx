@@ -42,7 +42,7 @@ export default function FileListPage() {
 
     const handleDownload = (fileName: string) => {
         const link = document.createElement("a")
-        link.href = `src/assets/${fileName}`
+        link.href = `src/uploads/${fileName}`
         link.download = fileName
         document.body.appendChild(link)
         link.click()
